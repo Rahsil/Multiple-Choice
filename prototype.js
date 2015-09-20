@@ -3,20 +3,13 @@
 /*global exampleExercise*/
 
 $(document).ready(function(){
-    
-<<<<<<< HEAD
-    var IN_EXERCISE = 0, NEXT_LEVEL = 1, EXERCISE_FINISHED = 2, IN_STATIC_EXERCISE = 3;
-    var state = 0;
 
-    var lvlArray = [newLvl1Exercise, exampleExercise, newLvl2Exercise]; // currently hard coded array, should be changed
-    var numbLvl = lvlArray.length;
-=======
+
     var INITIALIZATION = 0, IN_DYNAMIC_EXERCISE = 1, NEXT_LEVEL = 2, EXERCISE_FINISHED = 3, IN_STATIC_EXERCISE = 4;
     var state = INITIALIZATION;
 
     var lvlArray;
     var numbLvl;
->>>>>>> Update_State-system
     var currentLvl = 0;
     var numbExDefault = 3;
     var numbRightSol = 0; // for progressbar
@@ -41,13 +34,11 @@ $(document).ready(function(){
 
 
     initiate();
-    //generateExercise();
 
     function initiate(){
         $('.progress-bar').attr("aria-valuemax", progressbarMax);
         $('.progress').width("50%");
         $('#sendBtn').click(checkSolution);
-        //$('#nextBtn').click(generateExercise);
         $('#nextBtn').click(onNextBtn);
         $('#nextBtn').hide();
         $('#ckcontainer').width("50%");
