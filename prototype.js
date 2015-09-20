@@ -4,23 +4,25 @@
 
 $(document).ready(function(){
     
+<<<<<<< HEAD
     var IN_EXERCISE = 0, NEXT_LEVEL = 1, EXERCISE_FINISHED = 2, IN_STATIC_EXERCISE = 3;
     var state = 0;
 
     var lvlArray = [newLvl1Exercise, exampleExercise, newLvl2Exercise]; // currently hard coded array, should be changed
     var numbLvl = lvlArray.length;
+=======
+    var INITIALIZATION = 0, IN_DYNAMIC_EXERCISE = 1, NEXT_LEVEL = 2, EXERCISE_FINISHED = 3, IN_STATIC_EXERCISE = 4;
+    var state = INITIALIZATION;
+
+    var lvlArray;
+    var numbLvl;
+>>>>>>> Update_State-system
     var currentLvl = 0;
+    var numbExDefault = 3;
     var numbRightSol = 0; // for progressbar
-    var progressbarMax = 2;
+    var progressbarMax = numbExDefault;
     var solChecked = false;
-    
-    
-    $('.progress-bar').attr("aria-valuemax", progressbarMax);
-    $('.progress').width("50%");
-    $('#sendBtn').click(checkSolution);
-    $('#nextBtn').click(generateExercise);
-    $('#nextBtn').hide();
-    $('#ckcontainer').width("50%");
+
     
     // Strings
     var nxtLvlLabel = "Next Level";
@@ -31,55 +33,106 @@ $(document).ready(function(){
     var sendLabel = "Send";
     var finalLabel = "All exercises finished! Well done.";
     
-    
+    var lvlProblem;
     var problem = {};
     var numberOfChoices;
     var numbExCurrLvl = 0;
     var currExProblem = 0;
-    
-    generateExercise();
-    
-    
-    function generateExercise(){
-        $('#nextBtn').hide();
-        $('#ckcontainer').empty();
-        if(state === EXERCISE_FINISHED){
-            allFinished();
-            return 0; // do not generate a new solution
-        }
-        if(state === IN_STATIC_EXERCISE){
-            currExProblem++;
-        }
-        if(state === NEXT_LEVEL){
-            currentLvl++;
-            numbRightSol = 0;
-            $('.progress-bar').attr('aria-valuenow', numbRightSol);
-            $('.progress-bar').attr('style', "width: "+(numbRightSol/progressbarMax)*100+"%;");
-            $('#nextBtn').text(newExerciseLabel);
-            state = IN_EXERCISE;
-        }
-        solChecked = false;
-        var lvlProblem = lvlArray[currentLvl];
-        var testProblem = lvlProblem();
-        if(!testProblem["isStatic"]){
-            currExProblem= 0;
-            problem = {};
-            problem[0] = testProblem;
-            state = IN_EXERCISE;
-        } else{
-            problem = testProblem;
-            numbExCurrLvl = problem.length;
-            progressbarMax = numbExCurrLvl;
-            $('.progress-bar').attr('aria-valuemax', numbExCurrLvl+1);
-            state = IN_STATIC_EXERCISE;
-        }
 
-        numberOfChoices = problem[currExProblem]["answers"].length;
+
+    initiate();
+    //generateExercise();
+
+    function initiate(){
+        $('.progress-bar').attr("aria-valuemax", progressbarMax);
+        $('.progress').width("50%");
+        $('#sendBtn').click(checkSolution);
+        //$('#nextBtn').click(generateExercise);
+        $('#nextBtn').click(onNextBtn);
+        $('#nextBtn').hide();
+        $('#ckcontainer').width("50%");
+
+        lvlArray = [newLvl1Exercise, exampleExercise, newLvl2Exercise];
+        numbLvl = lvlArray.length;
+        lvlProblem = lvlArray[0];
+        if(!lvlProblem()["isStatic"]){
+            setUpDynamicExercise(lvlProblem);
+        } else{
+            setUpStaticExercise(lvlProblem);
+        }
+    }
+
+    function setUpDynamicExercise(lvlProblem){
+        numbExCurrLvl = numbExDefault;
+        progressbarMax = numbExCurrLvl;
+        problem[0] = lvlProblem();
+        numberOfChoices = problem[0]["answers"].length;
         generateCheckboxes();
-        $('#exercise').text(problem[currExProblem]["problem"]);
+        setExerciseTitle(problem[0]["problem"]);
         $('#sendBtn').text(sendLabel);
     }
-    
+
+    function setUpStaticExercise(lvlProblem){
+        problem = lvlProblem();
+        numbExCurrLvl = problem.length;
+        progressbarMax = numbExCurrLvl;
+        numberOfChoices = problem[currExProblem]["answers"].length;
+        generateCheckboxes();
+        setExerciseTitle(problem[currExProblem]["problem"]);
+        $('#sendBtn').text(sendLabel);
+    }
+
+    function lvlUp(){
+        numbRightSol = 0;
+        currExProblem = 0;
+        currentLvl++;
+        lvlProblem = lvlArray[currentLvl];
+        updateState();
+        if(state === IN_DYNAMIC_EXERCISE){
+            updateProgressbar();
+            setUpDynamicExercise(lvlProblem);
+        } else if(state === IN_STATIC_EXERCISE){
+            updateProgressbar();
+            setUpStaticExercise(lvlProblem);
+        } else{
+            console.log("Illegal State! " + state);
+        }
+    }
+
+    function exerciseFinished(){
+        $('#ckcontainer').empty();
+        allFinished();
+    }
+
+    function onNextBtn(){
+        clearExercise();
+        switch (state){
+            case EXERCISE_FINISHED:
+                exerciseFinished();
+                break;
+            case NEXT_LEVEL:
+                lvlUp();
+                break;
+            case IN_DYNAMIC_EXERCISE:
+                setUpDynamicExercise(lvlProblem);
+                break;
+            case IN_STATIC_EXERCISE:
+                currExProblem++;
+                setUpStaticExercise(lvlProblem);
+                break;
+        }
+    }
+
+    function setExerciseTitle(exTitle){
+        $('#exercise').text(exTitle);
+    }
+
+    function clearExercise(){
+        $('#ckcontainer').empty();
+        $('#nextBtn').hide();
+        solChecked = false;
+    }
+
     function isRight(){
         if(!checkRightAnswers()){
             $('#sendBtn').text(wrongLabel);
@@ -195,19 +248,18 @@ $(document).ready(function(){
     }
     
     function updateState(){
-        if(numbRightSol >= progressbarMax){
+        if(numbRightSol >= progressbarMax && state != NEXT_LEVEL){
             if(currentLvl === (numbLvl -1)){
                 state = EXERCISE_FINISHED;
             } else{
                 state = NEXT_LEVEL;
             }
         } else{
-            if(problem["isStatic"]){
+            if(lvlProblem()["isStatic"]){
                 state = IN_STATIC_EXERCISE;
             } else{
-                state = IN_EXERCISE;
+                state = IN_DYNAMIC_EXERCISE;
             }
-
         }
     }
     
@@ -219,9 +271,11 @@ $(document).ready(function(){
             case NEXT_LEVEL:
                 $('#nextBtn').text(nxtLvlLabel);
                 break;
-            case IN_EXERCISE:
+            case IN_DYNAMIC_EXERCISE:
                 $('#nextBtn').text(newExerciseLabel);
                 break;
+            case IN_STATIC_EXERCISE:
+                $('#nextBtn').text(newExerciseLabel);
             default:
                 $('#nextBtn').text(newExerciseLabel);
         }
@@ -229,6 +283,7 @@ $(document).ready(function(){
     
     function updateProgressbar(numbRightSol){
         $('.progress-bar').attr("aria-valuenow", numbRightSol);
+        $('.progress-bar').attr('aria-valuemax', numbExCurrLvl+1);
         $('.progress-bar').attr('style', "width: "+(numbRightSol/progressbarMax)*100+"%;");
     }
 });
