@@ -6,8 +6,7 @@ $(document).ready(function(){
     
     var IN_EXERCISE = 0, NEXT_LEVEL = 1, EXERCISE_FINISHED = 2, IN_STATIC_EXERCISE = 3;
     var state = 0;
-    
-    //var lvlArray = new Array(numbLvl);
+
     var lvlArray = [newLvl1Exercise, exampleExercise, newLvl2Exercise]; // currently hard coded array, should be changed
     var numbLvl = lvlArray.length;
     var currentLvl = 0;
@@ -115,10 +114,6 @@ $(document).ready(function(){
     
     function generateCheckboxes(){
        for(var i = 0; i < numberOfChoices; i++){
-           /*
-           $('#ckcontainer').append(generateBootstrapCheckbox("...", i));
-           $('.cktxt' + i).text = 'blabla';//*/
-           //
            $('#ckcontainer').append(createDivElement("ckbx", "ckbx" + i));
            $('#ckbx'+i).append(createInputElement("checkbox", "Aufgabe1", "ck"+i));
            $('#ckbx' +i).append(createSpanElement("cktxt"+i, problem[currExProblem]["answers"][i]));
@@ -197,24 +192,6 @@ $(document).ready(function(){
         var div = document.createElement('div');
         $(div).attr('class', divClass);
         return $(div);
-    }
-
-    function generateBootstrapCheckbox(ariaLabel, i){
-        var ckDivB = generateBootstrapDiv('row');
-        var ckDivA = generateBootstrapDiv('col-lg-1');
-        var ckSpan = generateBootstrapSpan('input-group-addon');
-        var ckText = generateBootstrapSpan('cktxt' + i);
-
-
-
-        var ckbx = document.createElement('input');
-        ckbx.type = "checkbox";
-        $(ckbx).attr('aria-label', ariaLabel);
-        $(ckSpan).append($(ckbx));
-        $(ckDivA).append($(ckSpan));
-        $(ckDivA).append($(ckText));
-        $(ckDivB).append($(ckDivA));
-        return $(ckDivB);
     }
     
     function updateState(){
