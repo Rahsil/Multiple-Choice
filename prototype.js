@@ -25,6 +25,7 @@ $(document).ready(function(){
     var correctLabel = "Correct!";
     var sendLabel = "Send";
     var finalLabel = "All exercises finished! Well done.";
+    var hintLabel = "Hint";
     
     var lvlProblem;
     var problem = {};
@@ -161,7 +162,11 @@ $(document).ready(function(){
            $('#ckcontainer').append(createDivElement("ckbx", "ckbx" + i));
            $('#ckbx'+i).append(createInputElement("checkbox", "Aufgabe1", "ck"+i));
            $('#ckbx' +i).append(createSpanElement("cktxt"+i, problem[currExProblem]["answers"][i]));
-           //*/
+           if(state === IN_STATIC_EXERCISE && problem[currExProblem]["hints"][i] != ""){
+               $('#ckbx' +i).append(createHintBtn("hint" + i, i));
+               $('#ckbx' + i).append(createCollapsedHint(problem[currExProblem]["hints"][i], i));
+           }
+
         }        
     }
     
@@ -225,6 +230,34 @@ $(document).ready(function(){
         newSpan.textContent = spanTextContent;
         return newSpan;
     }
+
+    function createHintBtn(btnId, i){
+        var btn = document.createElement('BUTTON');
+        btn.type = "button";
+        $(btn).attr('class', 'btn btn-default btn-xs collapsed');
+        btn.id = btnId;
+        $(btn).text(hintLabel);
+        $(btn).attr('data-toggle', 'collapse');
+        $(btn).attr('data-target', '#hintDiv' + i);
+        $(btn).attr('aria-expanded', 'false');
+        $(btn).attr('aria-controls', 'hintDiv' + i);
+        return btn;
+    }
+
+    function createCollapsedHint(txt, i){
+        var hintDiv = document.createElement("div");
+        var txtDiv = document.createElement("div");
+        $(txtDiv).text(txt);
+        txtDiv.class = "well";
+        $(hintDiv).attr('class', 'collapse');
+        hintDiv.id = ("hintDiv" + i);
+        $(hintDiv).attr('aria-expanded', 'false');
+        //$(hintDiv).text(txt);
+        $(hintDiv).attr("style", "height: 0px");
+        $(hintDiv).append($(txtDiv));
+        return hintDiv;
+    }
+
 
     function generateBootstrapSpan(spanClass){
         var span = document.createElement('span');
