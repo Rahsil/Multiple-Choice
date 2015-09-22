@@ -52,7 +52,7 @@ function generateSolutions(rightSolIDs, answers){
 }
 
 function getRndInt(lower, upper){
-    return  Math.floor(upper*Math.random()+lower);
+    return  Math.floor((upper-lower+1)*Math.random()+lower);
 }
 
 function getNewNumber(array, lower, upper){
