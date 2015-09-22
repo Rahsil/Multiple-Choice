@@ -15,7 +15,7 @@ var newLvl1Exercise = function(){
     var b = getRndInt(1, 5);
     var rightSol = a+b;
     for(var i = 0; i < this.numberOfRightAnswers; i++){
-        this.rightSolIDs[i] = getNewNumber(this.rightSolIDs, 0,this.numberOfChoices);
+        this.rightSolIDs[i] = getNewNumber(this.rightSolIDs, 0,this.numberOfChoices - 1);
     }
     
     this.problem = "What is " + a + " + " + b + "?";
