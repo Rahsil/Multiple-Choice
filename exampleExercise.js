@@ -18,6 +18,10 @@ var exampleExercise = function(){
     this.rightSolIDs[0] = [1, 3];
     this.rightSolIDs[1] = [0, 3];
 
+    this.explanation = [];
+    this.explanation[0] = ["", "Explanation", "Explanation", ""];
+    this.explanation[1] = ["", "Explanation", "", "Explanation", ""];
+
 
 
     this.isStatic = true;
@@ -30,6 +34,7 @@ var exampleExercise = function(){
         problemSet[i]["problem"] = this.problem[i];
         problemSet[i]["answers"] = this.answers[i];
         problemSet[i]["rightSolIDs"] = this.rightSolIDs[i];
+        problemSet[i]["explanation"] = this.explanation[i];
     }
 
     return problemSet;

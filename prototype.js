@@ -25,6 +25,7 @@ $(document).ready(function(){
     var correctLabel = "Correct!";
     var sendLabel = "Send";
     var finalLabel = "All exercises finished! Well done.";
+    var explanationLabel = "Explanation";
     
     var lvlProblem;
     var problem = {};
@@ -150,6 +151,9 @@ $(document).ready(function(){
         updateState();
         updateNextBtnLabel();
         $('#nextBtn').show();
+        for(var i = 0; i < numberOfChoices; i++){
+            $('#explanation' + i).show();
+        }
     }
     
     function allFinished(){
@@ -164,7 +168,12 @@ $(document).ready(function(){
            $('#ckcontainer').append(createDivElement("ckbx", "ckbx" + i));
            $('#ckbx'+i).append(createInputElement("checkbox", "Aufgabe1", "ck"+i));
            $('#ckbx' +i).append(createSpanElement("cktxt"+i, problem[currExProblem]["answers"][i]));
-           //*/
+           if(state === IN_STATIC_EXERCISE && problem[currExProblem]["explanation"][i] != ""){
+               $('#ckbx' +i).append(createExplanationBtn("explanation" + i, i));
+               $('#ckbx' + i).append(createCollapsedExplanation(problem[currExProblem]["explanation"][i], i));
+               $('#explanation' + i).hide();
+           }
+
         }        
     }
     
@@ -227,6 +236,32 @@ $(document).ready(function(){
         newSpan.id = spanID;
         newSpan.textContent = spanTextContent;
         return newSpan;
+    }
+
+    function createExplanationBtn(btnId, i){
+        var btn = document.createElement('BUTTON');
+        btn.type = "button";
+        $(btn).attr('class', 'btn btn-default btn-xs collapsed pull-right');
+        btn.id = btnId;
+        $(btn).text(explanationLabel);
+        $(btn).attr('data-toggle', 'collapse');
+        $(btn).attr('data-target', '#explanationDiv' + i);
+        $(btn).attr('aria-expanded', 'false');
+        $(btn).attr('aria-controls', 'explanationDiv' + i);
+        return btn;
+    }
+
+    function createCollapsedExplanation(txt, i){
+        var explanationDiv = document.createElement("div");
+        var txtDiv = document.createElement("div");
+        $(txtDiv).text(txt);
+        txtDiv.class = "well";
+        $(explanationDiv).attr('class', 'collapse');
+        explanationDiv.id = ("explanationDiv" + i);
+        $(explanationDiv).attr('aria-expanded', 'false');
+        $(explanationDiv).attr("style", "height: 0px");
+        $(explanationDiv).append($(txtDiv));
+        return explanationDiv;
     }
     
     function updateState(){
