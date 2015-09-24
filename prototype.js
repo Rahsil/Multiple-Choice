@@ -141,6 +141,8 @@ $(document).ready(function(){
         if(isRight() && !solChecked){
             numbRightSol++;
             updateProgressbar(numbRightSol);
+        } else if(state === IN_STATIC_EXERCISE){
+            numbRightSol++;
         }
         setColors();
         solChecked = true;
