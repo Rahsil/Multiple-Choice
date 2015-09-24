@@ -47,8 +47,10 @@ $(document).ready(function(){
         numbLvl = lvlArray.length;
         lvlProblem = lvlArray[0];
         if(!lvlProblem()["isStatic"]){
+            state = IN_DYNAMIC_EXERCISE;
             setUpDynamicExercise(lvlProblem);
         } else{
+            state = IN_STATIC_EXERCISE;
             setUpStaticExercise(lvlProblem);
         }
     }
@@ -80,10 +82,10 @@ $(document).ready(function(){
         lvlProblem = lvlArray[currentLvl];
         updateState();
         if(state === IN_DYNAMIC_EXERCISE){
-            updateProgressbar();
+            updateProgressbar(numbRightSol);
             setUpDynamicExercise(lvlProblem);
         } else if(state === IN_STATIC_EXERCISE){
-            updateProgressbar();
+            updateProgressbar(numbRightSol);
             setUpStaticExercise(lvlProblem);
         } else{
             console.log("Illegal State! " + state);
@@ -140,7 +142,6 @@ $(document).ready(function(){
     function checkSolution(){
         if(isRight() && !solChecked){
             numbRightSol++;
-            updateProgressbar(numbRightSol);
         } else if(state === IN_STATIC_EXERCISE){
             numbRightSol++;
         }
@@ -226,18 +227,6 @@ $(document).ready(function(){
         newSpan.id = spanID;
         newSpan.textContent = spanTextContent;
         return newSpan;
-    }
-
-    function generateBootstrapSpan(spanClass){
-        var span = document.createElement('span');
-        $(span).attr('class', spanClass);
-        return $(span);
-    }
-
-    function generateBootstrapDiv(divClass){
-        var div = document.createElement('div');
-        $(div).attr('class', divClass);
-        return $(div);
     }
     
     function updateState(){
