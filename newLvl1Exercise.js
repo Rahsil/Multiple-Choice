@@ -17,18 +17,23 @@ var newLvl1Exercise = function(){
     for(var i = 0; i < this.numberOfRightAnswers; i++){
         this.rightSolIDs[i] = getNewNumber(this.rightSolIDs, 0,this.numberOfChoices - 1);
     }
+
+    this.hint = [];
+    this.hint[0] = "This is a hint.";
+
+
     
     this.problem = "What is " + a + " + " + b + "?";
     for(var j = 0; j < this.rightSolIDs.length; j++){
         this.answers[this.rightSolIDs[j]] = rightSol;
     }
     this.answers = generateSolutions(this.rightSolIDs, this.answers);
-    console.log(this.answers);
     return {
         "problem": this.problem,
         "answers": this.answers,
         "rightSolIDs": this.rightSolIDs,
-        "isStatic": this.isStatic
+        "isStatic": this.isStatic,
+        "hint": this.hint
     };
 };
 

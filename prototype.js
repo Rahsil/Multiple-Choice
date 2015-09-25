@@ -26,6 +26,8 @@ $(document).ready(function(){
     var sendLabel = "Send";
     var finalLabel = "All exercises finished! Well done.";
     var explanationLabel = "Explanation";
+    var hintLabel = "Hint";
+    var newHintLabel = "new Hint";
     
     var lvlProblem;
     var problem = {};
@@ -63,6 +65,13 @@ $(document).ready(function(){
         numberOfChoices = problem[0]["answers"].length;
         generateCheckboxes();
         setExerciseTitle(problem[0]["problem"]);
+        console.log(problem[0]["hint"][0]);
+        if(problem[0]["hint"][0] != ""){
+            $('body').append(createCollapsedHints(problem[0]["hint"][0]));
+            $('#hintBtn').removeClass('disabled');
+            $('#hintBtn').attr('data-target', '#hintDiv');
+            $('#hintBtn').attr('aria-controls', 'hintDiv');
+        }
         $('#sendBtn').text(sendLabel);
     }
 
@@ -73,6 +82,8 @@ $(document).ready(function(){
         numberOfChoices = problem[currExProblem]["answers"].length;
         generateCheckboxes();
         setExerciseTitle(problem[currExProblem]["problem"]);
+        createHintBtn();
+        createCollapsedHints();
         $('#sendBtn').text(sendLabel);
     }
 
@@ -262,6 +273,19 @@ $(document).ready(function(){
         $(explanationDiv).attr("style", "height: 0px");
         $(explanationDiv).append($(txtDiv));
         return explanationDiv;
+    }
+
+    function createCollapsedHints(txt){
+        var hintDiv = document.createElement("div");
+        var txtDiv = document.createElement("div");
+        txtDiv.class = "well";
+        $(hintDiv).text(txt);
+        $(hintDiv).attr('class','collapse');
+        $(hintDiv).attr('id', 'hintDiv');
+        $(hintDiv).attr('aria-expanded', 'false');
+        $(hintDiv).attr("style", "height: 0px");
+        $(hintDiv).append($(txtDiv));
+        return hintDiv;
     }
     
     function updateState(){
