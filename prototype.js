@@ -41,12 +41,12 @@ $(document).ready(function(){
 
     function initiate(){
         $('.progress-bar').attr("aria-valuemax", progressbarMax);
-        $('.progress').width("50%");
+        //$('.progress').width("50%");
         $('#sendBtn').click(checkSolution);
         $('#nextBtn').click(onNextBtn);
         $('#hintBtn').click(onHintBtn);
         $('#nextBtn').hide();
-        $('#ckcontainer').width("50%");
+        //$('#ckcontainer').width("50%");
 
         lvlArray = [newLvl1Exercise, exampleExercise, newLvl2Exercise];
         numbLvl = lvlArray.length;
@@ -70,7 +70,7 @@ $(document).ready(function(){
         if(typeof problem[0]["hint"] != 'undefined' && problem[0]["hint"][0] != ""){
             $('#hintBtn').removeClass('disabled');
             for(var i = 0; i < problem[0]["hint"].length; i++){
-                $('body').append(createCollapsedHint(problem[currExProblem]["hint"][i], i));
+                $('#exContainer').append(createCollapsedHint(problem[currExProblem]["hint"][i], i));
             }
         }
         $('#sendBtn').text(sendLabel);
@@ -86,7 +86,7 @@ $(document).ready(function(){
         if(typeof problem[currExProblem]["hint"] != 'undefined' && problem[currExProblem]["hint"][0] != ""){
             $('#hintBtn').removeClass('disabled');
             for(var i = 0; i < problem[0]["hint"].length; i++){
-                $('body').append(createCollapsedHint(problem[currExProblem]["hint"][i], i));
+                $('#exContainer').append(createCollapsedHint(problem[currExProblem]["hint"][i], i));
             }
         }
         $('#sendBtn').text(sendLabel);
@@ -308,9 +308,12 @@ $(document).ready(function(){
 
     function createCollapsedHint(txt, hintNo){
         var div = document.createElement("div");
-        $(div).text(txt);
+        var txtdiv = document.createElement("div");
+        $(txtdiv).text(txt);
+        $(txtdiv).attr('class', 'panel-body');
+        $(div).append(txtdiv);
         $(div).attr('id', 'hintDiv'+hintNo);
-        $(div).attr('class', 'collapse');
+        $(div).attr('class', 'collapse panel panel-default');
         return div;
     }
     

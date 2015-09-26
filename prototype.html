@@ -4,19 +4,21 @@
         <title>Multiple Choice Aufgabe 1</title>
     </head>
     <body>
-        <p id="exercise">
-           What is a+c? 
-        </p>
-        <div class="progress">
-            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="5" style="width: 0%;">
+        <div id="exContainer"  class="col-md-6 col-md-offset-3">
+            <h3 id="exercise">
+                Please wait until the exercise has loaded. (This requires JavaScript!)
+            </h3>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="5" style="width: 0%;">
+                </div>
             </div>
-        </div>
-        <div id="ckcontainer">
-        </div>
-        <div class="btn-group" role="group" aria-label="...">
-            <button type="button" class="btn btn-default" id="sendBtn">Send</button>
-            <button type="button" class="btn btn-default collapsed disabled" data-target="#hintDiv" data-toggle="collapse" aria-controls="hintDiv" aria-expanded="false" id="hintBtn">Hint</button>
-            <button type="button" class="btn btn-default" id="nextBtn">New Exercise</button>
+            <div id="ckcontainer">
+            </div>
+            <div id="btnGroup" class="btn-group" role="group" aria-label="...">
+                <button type="button" class="btn btn-default" id="sendBtn">Send</button>
+                <button type="button" class="btn btn-default collapsed disabled" data-target="#hintDiv" data-toggle="collapse" aria-controls="hintDiv" aria-expanded="false" id="hintBtn">Hint</button>
+                <button type="button" class="btn btn-default" id="nextBtn">New Exercise</button>
+            </div>
         </div>
         <script type="text/javascript" src="jquery-2.1.4.js"></script>
         <script type="text/javascript" src="newLvl1Exercise.js"></script>
