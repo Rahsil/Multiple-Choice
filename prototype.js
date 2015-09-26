@@ -184,12 +184,12 @@ $(document).ready(function(){
             numbRightSol++;
         }
         setColors();
-        solChecked = true;
         updateState();
-        updateProgressbar(numbRightSol);
         if(!solChecked){
             updateNextBtnLabel();
         }
+        solChecked = true;
+        updateProgressbar(numbRightSol);
         $('#nextBtn').show();
         for(var i = 0; i < numberOfChoices; i++){
             $('#explanation' + i).show();
