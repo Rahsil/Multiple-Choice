@@ -34,6 +34,7 @@ $(document).ready(function(){
     var numberOfChoices;
     var numbExCurrLvl = 0;
     var currExProblem = 0;
+    var hintNo = 0;
 
 
     initiate();
@@ -43,6 +44,7 @@ $(document).ready(function(){
         $('.progress').width("50%");
         $('#sendBtn').click(checkSolution);
         $('#nextBtn').click(onNextBtn);
+        $('#hintBtn').click(onHintBtn);
         $('#nextBtn').hide();
         $('#ckcontainer').width("50%");
 
@@ -59,18 +61,14 @@ $(document).ready(function(){
     }
 
     function setUpDynamicExercise(lvlProblem){
+        problem[0] = lvlProblem();
         numbExCurrLvl = numbExDefault;
         progressbarMax = numbExCurrLvl;
-        problem[0] = lvlProblem();
         numberOfChoices = problem[0]["answers"].length;
         generateCheckboxes();
         setExerciseTitle(problem[0]["problem"]);
-        console.log(problem[0]["hint"][0]);
-        if(problem[0]["hint"][0] != ""){
-            $('body').append(createCollapsedHints(problem[0]["hint"][0]));
+        if(typeof problem[0]["hint"] != 'undefined' && problem[0]["hint"][0] != ""){
             $('#hintBtn').removeClass('disabled');
-            $('#hintBtn').attr('data-target', '#hintDiv');
-            $('#hintBtn').attr('aria-controls', 'hintDiv');
         }
         $('#sendBtn').text(sendLabel);
     }
@@ -82,8 +80,9 @@ $(document).ready(function(){
         numberOfChoices = problem[currExProblem]["answers"].length;
         generateCheckboxes();
         setExerciseTitle(problem[currExProblem]["problem"]);
-        createHintBtn();
-        createCollapsedHints();
+        if(typeof problem[currExProblem]["hint"] != 'undefined' && problem[currExProblem]["hint"][0] != ""){
+            $('#hintBtn').removeClass('disabled');
+        }
         $('#sendBtn').text(sendLabel);
     }
 
@@ -128,6 +127,23 @@ $(document).ready(function(){
         }
     }
 
+    function onHintBtn(){
+        if(typeof problem[currExProblem]["hint"] === 'undefined'){
+            $('#hintBtn').addClass('disabled');
+            return 0;
+        }
+        if(!$('#hintBtn').hasClass('disabled') && hintNo < problem[currExProblem]["hint"].length){
+            $('body').append(createHint(problem[currExProblem]["hint"][hintNo], hintNo));
+            hintNo++;
+        }
+        if(hintNo === problem[currExProblem]["hint"].length){
+            $('#hintBtn').addClass('disabled');
+            $('#hintBtn').removeAttr('data-toggle');
+        } else{
+            $('#hintBtn').text(newHintLabel);
+        }
+    }
+
     function setExerciseTitle(exTitle){
         $('#exercise').text(exTitle);
     }
@@ -135,6 +151,10 @@ $(document).ready(function(){
     function clearExercise(){
         $('#ckcontainer').empty();
         $('#nextBtn').hide();
+        $('#hintBtn').addClass('disabled');
+        $('#hintBtn').text(hintLabel);
+        $('.hintDiv').remove();
+        hintNo = 0;
         solChecked = false;
     }
 
@@ -160,6 +180,7 @@ $(document).ready(function(){
         setColors();
         solChecked = true;
         updateState();
+        updateProgressbar(numbRightSol);
         updateNextBtnLabel();
         $('#nextBtn').show();
         for(var i = 0; i < numberOfChoices; i++){
@@ -172,6 +193,7 @@ $(document).ready(function(){
         endDiv.textContent = finalLabel;
         $('#ckcontainer').append(endDiv);
         $('#sendBtn').hide();
+        $('#hintBtn').hide();
     }
     
     function generateCheckboxes(){
@@ -275,17 +297,12 @@ $(document).ready(function(){
         return explanationDiv;
     }
 
-    function createCollapsedHints(txt){
-        var hintDiv = document.createElement("div");
-        var txtDiv = document.createElement("div");
-        txtDiv.class = "well";
-        $(hintDiv).text(txt);
-        $(hintDiv).attr('class','collapse');
-        $(hintDiv).attr('id', 'hintDiv');
-        $(hintDiv).attr('aria-expanded', 'false');
-        $(hintDiv).attr("style", "height: 0px");
-        $(hintDiv).append($(txtDiv));
-        return hintDiv;
+    function createHint(txt, hintNo){
+        var div = document.createElement("div");
+        $(div).text(txt);
+        $(div).attr('id', 'hintDiv'+hintNo);
+        $(div).attr('class', 'hintDiv');
+        return div;
     }
     
     function updateState(){

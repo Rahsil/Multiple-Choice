@@ -22,6 +22,10 @@ var exampleExercise = function(){
     this.explanation[0] = ["", "Explanation", "Explanation", ""];
     this.explanation[1] = ["", "Explanation", "", "Explanation", ""];
 
+    this.hint = [];
+    this.hint[0] = ["This is ...", "... a hint!"];
+    this.hint[1] = ["And this... ", "is also one!"];
+
 
 
     this.isStatic = true;
@@ -35,6 +39,7 @@ var exampleExercise = function(){
         problemSet[i]["answers"] = this.answers[i];
         problemSet[i]["rightSolIDs"] = this.rightSolIDs[i];
         problemSet[i]["explanation"] = this.explanation[i];
+        problemSet[i]["hint"] = this.hint[i];
     }
 
     return problemSet;
