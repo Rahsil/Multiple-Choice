@@ -206,7 +206,7 @@ $(document).ready(function(){
     
     function generateCheckboxes(){
        for(var i = 0; i < numberOfChoices; i++){
-           $('#ckcontainer').append(createDivElement("ckbx", "ckbx" + i));
+           $('#ckcontainer').append(createCkDivElement("ckbx", "ckbx" + i));
            $('#ckbx'+i).append(createInputElement("checkbox", "Aufgabe1", "ck"+i));
            $('#ckbx' +i).append(createSpanElement("cktxt"+i, problem[currExProblem]["answers"][i]));
            if(state === IN_STATIC_EXERCISE && problem[currExProblem]["explanation"][i] != ""){
@@ -222,15 +222,15 @@ $(document).ready(function(){
         for(var i = 0; i < numberOfChoices; i++){
             if($.inArray(i, problem[currExProblem]["rightSolIDs"]) > -1){
                 if($('#ck' + i).is(":checked")){
-                    $('#ckbx' + i).css("background-color", "green");    
+                    $('#ckbx'+i).attr('class', 'alert alert-success');
                 } else{
-                    $('#ckbx' + i).css("background-color", "red");
+                    $('#ckbx'+i).attr('class', 'alert alert-danger');
                 }
             } else{
                 if($('#ck' + i).is(":checked")){
-                    $('#ckbx' + i).css("background-color", "red");
+                    $('#ckbx'+i).attr('class', 'alert alert-danger');
                 } else{
-                    $('#ckbx' + i).css("background-color", "green");
+                    $('#ckbx'+i).attr('class', 'alert alert-success');
                 }
             }
         }
@@ -257,11 +257,12 @@ $(document).ready(function(){
         return true;
     }
     
-    function createDivElement(divClass, divId){
-            var newDiv = document.createElement("div");
-            newDiv.class = divClass;
-            newDiv.id = divId;
-            return newDiv;
+    function createCkDivElement(divClass, divId){
+        var newDiv = document.createElement("div");
+        newDiv.id = divId;
+        $(newDiv).attr('class', 'alert ' + divClass);
+        $(newDiv).attr('role', 'alert');
+        return newDiv;
     }
     
     function createInputElement(inputType, inputName, inputId){
