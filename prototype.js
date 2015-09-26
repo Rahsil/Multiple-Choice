@@ -2,7 +2,7 @@
 /*global newLvl2Exercise*/
 /*global exampleExercise*/
 
-$(document).ready(function(){
+$(document).ready(function () {
 
 
     var INITIALIZATION = 0, IN_DYNAMIC_EXERCISE = 1, NEXT_LEVEL = 2, EXERCISE_FINISHED = 3, IN_STATIC_EXERCISE = 4;
@@ -16,7 +16,7 @@ $(document).ready(function(){
     var progressbarMax = numbExDefault;
     var solChecked = false;
 
-    
+
     // Strings
     var nxtLvlLabel = "Next Level";
     var exFinLabel = "Exercise finished";
@@ -28,7 +28,7 @@ $(document).ready(function(){
     var explanationLabel = "Explanation";
     var hintLabel = "Hint";
     var newHintLabel = "new Hint";
-    
+
     var lvlProblem;
     var problem = {};
     var numberOfChoices;
@@ -39,84 +39,88 @@ $(document).ready(function(){
 
     initiate();
 
-    function initiate(){
+    function initiate() {
         $('.progress-bar').attr("aria-valuemax", progressbarMax);
         //$('.progress').width("50%");
         $('#sendBtn').click(checkSolution);
         $('#nextBtn').click(onNextBtn);
         $('#hintBtn').click(onHintBtn);
         $('#nextBtn').hide();
-        //$('#ckcontainer').width("50%");
 
         lvlArray = [newLvl1Exercise, exampleExercise, newLvl2Exercise];
         numbLvl = lvlArray.length;
         lvlProblem = lvlArray[0];
-        if(!lvlProblem()["isStatic"]){
+        if (!lvlProblem()["isStatic"]) {
             state = IN_DYNAMIC_EXERCISE;
             setUpDynamicExercise(lvlProblem);
-        } else{
+        } else {
             state = IN_STATIC_EXERCISE;
             setUpStaticExercise(lvlProblem);
         }
     }
 
-    function setUpDynamicExercise(lvlProblem){
+    function setUpDynamicExercise(lvlProblem) {
         problem[0] = lvlProblem();
         numbExCurrLvl = numbExDefault;
         progressbarMax = numbExCurrLvl;
         numberOfChoices = problem[0]["answers"].length;
-        generateCheckboxes();
+        //generateCheckboxes();
+        createCheckboxes();
         setExerciseTitle(problem[0]["problem"]);
-        if(typeof problem[0]["hint"] != 'undefined' && problem[0]["hint"][0] != ""){
+        if (typeof problem[0]["hint"] != 'undefined' && problem[0]["hint"][0] != "") {
             $('#hintBtn').removeClass('disabled');
-            for(var i = 0; i < problem[0]["hint"].length; i++){
+            for (var i = 0; i < problem[0]["hint"].length; i++) {
                 $('#exContainer').append(createCollapsedHint(problem[currExProblem]["hint"][i], i));
             }
         }
         $('#sendBtn').text(sendLabel);
     }
 
-    function setUpStaticExercise(lvlProblem){
+    function setUpStaticExercise(lvlProblem) {
         problem = lvlProblem();
         numbExCurrLvl = problem.length;
         progressbarMax = numbExCurrLvl;
         numberOfChoices = problem[currExProblem]["answers"].length;
-        generateCheckboxes();
+        //generateCheckboxes();
+        createCheckboxes();
         setExerciseTitle(problem[currExProblem]["problem"]);
-        if(typeof problem[currExProblem]["hint"] != 'undefined' && problem[currExProblem]["hint"][0] != ""){
+        if (typeof problem[currExProblem]["hint"] != 'undefined' && problem[currExProblem]["hint"][0] != "") {
             $('#hintBtn').removeClass('disabled');
-            for(var i = 0; i < problem[0]["hint"].length; i++){
+            for (var i = 0; i < problem[0]["hint"].length; i++) {
                 $('#exContainer').append(createCollapsedHint(problem[currExProblem]["hint"][i], i));
             }
         }
         $('#sendBtn').text(sendLabel);
+        for (i = 0; i < numberOfChoices; i++) {
+            $('#explanation' + i).hide();
+        }
     }
 
-    function lvlUp(){
+    function lvlUp() {
         numbRightSol = 0;
         currExProblem = 0;
         currentLvl++;
         lvlProblem = lvlArray[currentLvl];
         updateState();
-        if(state === IN_DYNAMIC_EXERCISE){
+        if (state === IN_DYNAMIC_EXERCISE) {
             updateProgressbar(numbRightSol);
             setUpDynamicExercise(lvlProblem);
-        } else if(state === IN_STATIC_EXERCISE){
+        } else if (state === IN_STATIC_EXERCISE) {
             updateProgressbar(numbRightSol);
             setUpStaticExercise(lvlProblem);
-        } else{
+        } else {
             console.log("Illegal State! " + state);
         }
     }
 
-    function exerciseFinished(){
+    function exerciseFinished() {
         $('#ckcontainer').empty();
         allFinished();
     }
 
-    function onNextBtn(){
+    function onNextBtn() {
         clearExercise();
-        switch (state){
+        switch (state) {
             case EXERCISE_FINISHED:
                 exerciseFinished();
                 break;
@@ -133,28 +137,28 @@ $(document).ready(function(){
         }
     }
 
-    function onHintBtn(){
-        if(typeof problem[currExProblem]["hint"] === 'undefined'){
+    function onHintBtn() {
+        if (typeof problem[currExProblem]["hint"] === 'undefined') {
             $('#hintBtn').addClass('disabled');
             return 0;
         }
-        if(!$('#hintBtn').hasClass('disabled') && hintNo < problem[currExProblem]["hint"].length){
+        if (!$('#hintBtn').hasClass('disabled') && hintNo < problem[currExProblem]["hint"].length) {
             $('#hintDiv' + hintNo).collapse();
             hintNo++;
         }
-        if(hintNo === problem[currExProblem]["hint"].length){
+        if (hintNo === problem[currExProblem]["hint"].length) {
             $('#hintBtn').addClass('disabled');
             $('#hintBtn').removeAttr('data-toggle');
-        } else{
+        } else {
             $('#hintBtn').text(newHintLabel);
         }
     }
 
-    function setExerciseTitle(exTitle){
+    function setExerciseTitle(exTitle) {
         $('#exercise').text(exTitle);
     }
 
-    function clearExercise(){
+    function clearExercise() {
         $('#ckcontainer').empty();
         $('#nextBtn').hide();
         $('#hintBtn').addClass('disabled');
@@ -164,176 +168,185 @@ $(document).ready(function(){
         solChecked = false;
     }
 
-    function isRight(){
-        if(!checkRightAnswers()){
+    function isRight() {
+        if (!checkRightAnswers()) {
             $('#sendBtn').text(wrongLabel);
             return false;
         }
-        if(!checkWrongAnswers()){
+        if (!checkWrongAnswers()) {
             $('#sendBtn').text(wrongLabel);
             return false;
         }
         $('#sendBtn').text(correctLabel);
         return true;
     }
-    
-    function checkSolution(){
-        if(isRight() && !solChecked){
+
+    function checkSolution() {
+        if (isRight() && !solChecked) {
             numbRightSol++;
-        } else if(state === IN_STATIC_EXERCISE && !solChecked){
+        } else if (state === IN_STATIC_EXERCISE && !solChecked) {
             numbRightSol++;
         }
         setColors();
         updateState();
-        if(!solChecked){
+        if (!solChecked) {
             updateNextBtnLabel();
         }
         solChecked = true;
         updateProgressbar(numbRightSol);
         $('#nextBtn').show();
-        for(var i = 0; i < numberOfChoices; i++){
+        for (var i = 0; i < numberOfChoices; i++) {
             $('#explanation' + i).show();
         }
     }
-    
-    function allFinished(){
-        var endDiv = document.createElement("div");
+
+    function allFinished() {
+        var endDiv = document.createElement('div');
         endDiv.textContent = finalLabel;
+        $(endDiv).attr('class', 'alert alert-info');
+        $(endDiv).attr('role', 'alert');
         $('#ckcontainer').append(endDiv);
         $('#sendBtn').hide();
         $('#hintBtn').hide();
     }
-    
-    function generateCheckboxes(){
-       for(var i = 0; i < numberOfChoices; i++){
-           $('#ckcontainer').append(createCkDivElement("ckbx", "ckbx" + i));
-           $('#ckbx'+i).append(createInputElement("checkbox", "Aufgabe1", "ck"+i));
-           $('#ckbx' +i).append(createSpanElement("cktxt"+i, problem[currExProblem]["answers"][i]));
-           if(state === IN_STATIC_EXERCISE && problem[currExProblem]["explanation"][i] != ""){
-               $('#ckbx' +i).append(createExplanationBtn("explanation" + i, i));
-               $('#ckbx' + i).append(createCollapsedExplanation(problem[currExProblem]["explanation"][i], i));
-               $('#explanation' + i).hide();
-           }
 
-        }        
+    function createCheckboxes() {
+        for (var i = 0; i < numberOfChoices; i++) {
+            createCheckboxPanel(i);
+        }
     }
-    
-    function setColors(){
-        for(var i = 0; i < numberOfChoices; i++){
-            if($.inArray(i, problem[currExProblem]["rightSolIDs"]) > -1){
-                if($('#ck' + i).is(":checked")){
-                    $('#ckbx'+i).attr('class', 'alert alert-success');
-                } else{
-                    $('#ckbx'+i).attr('class', 'alert alert-danger');
+
+    function createCheckboxPanel(i) {
+        var panelGroupDiv = document.createElement('div');
+        $(panelGroupDiv).attr('class', 'panel-group');
+        var panelDefaultDiv = document.createElement('div');
+        $(panelDefaultDiv).attr('class', 'panel panel-default');
+        $(panelDefaultDiv).attr('id', 'ckbx' + i);
+        var panelHeadDiv = document.createElement('div');
+        $(panelHeadDiv).attr('class', 'panel-heading');
+
+        $(panelHeadDiv).append(createInputElement('checkbox', 'ck' + i));
+        $(panelHeadDiv).append(createSpanElement("cktxt" + i, problem[currExProblem]["answers"][i]));
+
+        $(panelDefaultDiv).append(panelHeadDiv);
+        if (state === IN_STATIC_EXERCISE && problem[currExProblem]["explanation"][i] != "") {
+            $(panelHeadDiv).append(createExplanationBtn('explanation' + i, i));
+            $(panelDefaultDiv).append(createCollapsedExplanationPanel(problem[currExProblem]["explanation"][i], i));
+        }
+
+        $(panelGroupDiv).append(panelDefaultDiv);
+        $('#ckcontainer').append(panelGroupDiv);
+
+    }
+
+    function createCollapsedExplanationPanel(txt, i) {
+        var collapsedDiv = document.createElement('div');
+        var panelBodyDiv = document.createElement('div');
+
+        $(collapsedDiv).attr('id', 'collapse' + i);
+        $(collapsedDiv).attr('class', 'panel-collapse collapse');
+        $(panelBodyDiv).attr('class', 'panel-body');
+        $(panelBodyDiv).text(txt);
+        $(collapsedDiv).append(panelBodyDiv);
+        return collapsedDiv;
+    }
+
+    function setColors() {
+        for (var i = 0; i < numberOfChoices; i++) {
+            if ($.inArray(i, problem[currExProblem]["rightSolIDs"]) > -1) {
+                if ($('#ck' + i).is(":checked")) {
+                    $('#ckbx' + i).attr('class', 'panel panel-success');
+                } else {
+                    $('#ckbx' + i).attr('class', 'panel panel-danger');
                 }
-            } else{
-                if($('#ck' + i).is(":checked")){
-                    $('#ckbx'+i).attr('class', 'alert alert-danger');
-                } else{
-                    $('#ckbx'+i).attr('class', 'alert alert-success');
+            } else {
+                if ($('#ck' + i).is(":checked")) {
+                    $('#ckbx' + i).attr('class', 'panel panel-danger');
+                } else {
+                    $('#ckbx' + i).attr('class', 'panel panel-success');
                 }
             }
         }
     }
-    
-    function checkRightAnswers(){
-        for(var i = 0; i < problem[currExProblem]["rightSolIDs"].length; i++){
-            if(!$('#ck' + problem[currExProblem]["rightSolIDs"][i]).is(":checked")){
+
+    function checkRightAnswers() {
+        for (var i = 0; i < problem[currExProblem]["rightSolIDs"].length; i++) {
+            if (!$('#ck' + problem[currExProblem]["rightSolIDs"][i]).is(":checked")) {
                 return false;
             }
         }
         return true;
     }
-    
-    function checkWrongAnswers(){
-        for(var i = 0; i < numberOfChoices; i++){
-            if($.inArray(i, problem[currExProblem]["rightSolIDs"]) > -1){
+
+    function checkWrongAnswers() {
+        for (var i = 0; i < numberOfChoices; i++) {
+            if ($.inArray(i, problem[currExProblem]["rightSolIDs"]) > -1) {
                 continue;
             }
-            if($('#ck'+ i).is(":checked")){
+            if ($('#ck' + i).is(":checked")) {
                 return false;
             }
         }
         return true;
     }
-    
-    function createCkDivElement(divClass, divId){
-        var newDiv = document.createElement("div");
-        newDiv.id = divId;
-        $(newDiv).attr('class', 'alert ' + divClass);
-        $(newDiv).attr('role', 'alert');
-        return newDiv;
-    }
-    
-    function createInputElement(inputType, inputName, inputId){
+
+    function createInputElement(inputType, inputId) {
         var newCkBx = document.createElement('input');
         newCkBx.type = inputType;
-        newCkBx.name = inputName;
         newCkBx.id = inputId;
         return newCkBx;
     }
-    
-    function createSpanElement(spanID, spanTextContent){
+
+    function createSpanElement(spanID, spanTextContent) {
         var newSpan = document.createElement('span');
         newSpan.id = spanID;
         newSpan.textContent = spanTextContent;
         return newSpan;
     }
 
-    function createExplanationBtn(btnId, i){
-        var btn = document.createElement('BUTTON');
+    function createExplanationBtn(btnId, i) {
+        var btn = document.createElement('button');
         btn.type = "button";
         $(btn).attr('class', 'btn btn-default btn-xs collapsed pull-right');
         btn.id = btnId;
         $(btn).text(explanationLabel);
         $(btn).attr('data-toggle', 'collapse');
-        $(btn).attr('data-target', '#explanationDiv' + i);
+        //$(btn).attr('data-target', '#explanationDiv' + i);
+        $(btn).attr('data-target', '#collapse' + i);
         $(btn).attr('aria-expanded', 'false');
-        $(btn).attr('aria-controls', 'explanationDiv' + i);
+        //$(btn).attr('aria-controls', 'explanationDiv' + i);
+        $(btn).attr('aria-controls', 'collapse' + i);
         return btn;
     }
 
-    function createCollapsedExplanation(txt, i){
-        var explanationDiv = document.createElement("div");
+    function createCollapsedHint(txt, hintNo) {
+        var div = document.createElement("div");
         var txtDiv = document.createElement("div");
         $(txtDiv).text(txt);
-        txtDiv.class = "well";
-        $(explanationDiv).attr('class', 'collapse');
-        explanationDiv.id = ("explanationDiv" + i);
-        $(explanationDiv).attr('aria-expanded', 'false');
-        $(explanationDiv).attr("style", "height: 0px");
-        $(explanationDiv).append($(txtDiv));
-        return explanationDiv;
-    }
-
-    function createCollapsedHint(txt, hintNo){
-        var div = document.createElement("div");
-        var txtdiv = document.createElement("div");
-        $(txtdiv).text(txt);
-        $(txtdiv).attr('class', 'panel-body');
-        $(div).append(txtdiv);
-        $(div).attr('id', 'hintDiv'+hintNo);
+        $(txtDiv).attr('class', 'panel-body');
+        $(div).append(txtDiv);
+        $(div).attr('id', 'hintDiv' + hintNo);
         $(div).attr('class', 'collapse panel panel-default');
         return div;
     }
-    
-    function updateState(){
-        if(numbRightSol >= progressbarMax && state != NEXT_LEVEL){
-            if(currentLvl === (numbLvl -1)){
+
+    function updateState() {
+        if (numbRightSol >= progressbarMax && state != NEXT_LEVEL) {
+            if (currentLvl === (numbLvl - 1)) {
                 state = EXERCISE_FINISHED;
-            } else{
+            } else {
                 state = NEXT_LEVEL;
             }
-        } else{
-            if(lvlProblem()["isStatic"]){
+        } else {
+            if (lvlProblem()["isStatic"]) {
                 state = IN_STATIC_EXERCISE;
-            } else{
+            } else {
                 state = IN_DYNAMIC_EXERCISE;
             }
         }
     }
-    
-    function updateNextBtnLabel(){
+
+    function updateNextBtnLabel() {
         switch (state) {
             case EXERCISE_FINISHED:
                 $('#nextBtn').text(exFinLabel);
@@ -351,10 +364,10 @@ $(document).ready(function(){
                 $('#nextBtn').text(newExerciseLabel);
         }
     }
-    
-    function updateProgressbar(numbRightSol){
+
+    function updateProgressbar(numbRightSol) {
         $('.progress-bar').attr("aria-valuenow", numbRightSol);
-        $('.progress-bar').attr('aria-valuemax', numbExCurrLvl+1);
-        $('.progress-bar').attr('style', "width: "+(numbRightSol/progressbarMax)*100+"%;");
+        $('.progress-bar').attr('aria-valuemax', numbExCurrLvl + 1);
+        $('.progress-bar').attr('style', "width: " + (numbRightSol / progressbarMax) * 100 + "%;");
     }
 });
