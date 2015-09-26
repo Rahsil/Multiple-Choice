@@ -69,6 +69,9 @@ $(document).ready(function(){
         setExerciseTitle(problem[0]["problem"]);
         if(typeof problem[0]["hint"] != 'undefined' && problem[0]["hint"][0] != ""){
             $('#hintBtn').removeClass('disabled');
+            for(var i = 0; i < problem[0]["hint"].length; i++){
+                $('body').append(createCollapsedHint(problem[currExProblem]["hint"][i], i));
+            }
         }
         $('#sendBtn').text(sendLabel);
     }
@@ -82,6 +85,9 @@ $(document).ready(function(){
         setExerciseTitle(problem[currExProblem]["problem"]);
         if(typeof problem[currExProblem]["hint"] != 'undefined' && problem[currExProblem]["hint"][0] != ""){
             $('#hintBtn').removeClass('disabled');
+            for(var i = 0; i < problem[0]["hint"].length; i++){
+                $('body').append(createCollapsedHint(problem[currExProblem]["hint"][i], i));
+            }
         }
         $('#sendBtn').text(sendLabel);
     }
@@ -133,7 +139,7 @@ $(document).ready(function(){
             return 0;
         }
         if(!$('#hintBtn').hasClass('disabled') && hintNo < problem[currExProblem]["hint"].length){
-            $('body').append(createHint(problem[currExProblem]["hint"][hintNo], hintNo));
+            $('#hintDiv' + hintNo).collapse();
             hintNo++;
         }
         if(hintNo === problem[currExProblem]["hint"].length){
@@ -153,7 +159,7 @@ $(document).ready(function(){
         $('#nextBtn').hide();
         $('#hintBtn').addClass('disabled');
         $('#hintBtn').text(hintLabel);
-        $('.hintDiv').remove();
+        $('.collapse').remove();
         hintNo = 0;
         solChecked = false;
     }
@@ -174,14 +180,16 @@ $(document).ready(function(){
     function checkSolution(){
         if(isRight() && !solChecked){
             numbRightSol++;
-        } else if(state === IN_STATIC_EXERCISE){
+        } else if(state === IN_STATIC_EXERCISE && !solChecked){
             numbRightSol++;
         }
         setColors();
         solChecked = true;
         updateState();
         updateProgressbar(numbRightSol);
-        updateNextBtnLabel();
+        if(!solChecked){
+            updateNextBtnLabel();
+        }
         $('#nextBtn').show();
         for(var i = 0; i < numberOfChoices; i++){
             $('#explanation' + i).show();
@@ -297,11 +305,11 @@ $(document).ready(function(){
         return explanationDiv;
     }
 
-    function createHint(txt, hintNo){
+    function createCollapsedHint(txt, hintNo){
         var div = document.createElement("div");
         $(div).text(txt);
         $(div).attr('id', 'hintDiv'+hintNo);
-        $(div).attr('class', 'hintDiv');
+        $(div).attr('class', 'collapse');
         return div;
     }
     
@@ -334,6 +342,7 @@ $(document).ready(function(){
                 break;
             case IN_STATIC_EXERCISE:
                 $('#nextBtn').text(newExerciseLabel);
+                break;
             default:
                 $('#nextBtn').text(newExerciseLabel);
         }
