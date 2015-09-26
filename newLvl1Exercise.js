@@ -5,7 +5,7 @@
  */
 var newLvl1Exercise = function(){
     this.numberOfChoices = 4; // < 10 !
-    this.numberOfRightAnswers = 2;
+    this.numberOfRightAnswers = 1;
     this.problem = "";
     this.answers = new Array(this.numberOfChoices);
     this.rightSolIDs = new Array(this.numberOfRightAnswers);

@@ -41,7 +41,6 @@ $(document).ready(function () {
 
     function initiate() {
         $('.progress-bar').attr("aria-valuemax", progressbarMax);
-        //$('.progress').width("50%");
         $('#sendBtn').click(checkSolution);
         $('#nextBtn').click(onNextBtn);
         $('#hintBtn').click(onHintBtn);
@@ -64,7 +63,6 @@ $(document).ready(function () {
         numbExCurrLvl = numbExDefault;
         progressbarMax = numbExCurrLvl;
         numberOfChoices = problem[0]["answers"].length;
-        //generateCheckboxes();
         createCheckboxes();
         setExerciseTitle(problem[0]["problem"]);
         if (typeof problem[0]["hint"] != 'undefined' && problem[0]["hint"][0] != "") {
@@ -81,7 +79,6 @@ $(document).ready(function () {
         numbExCurrLvl = problem.length;
         progressbarMax = numbExCurrLvl;
         numberOfChoices = problem[currExProblem]["answers"].length;
-        //generateCheckboxes();
         createCheckboxes();
         setExerciseTitle(problem[currExProblem]["problem"]);
         if (typeof problem[currExProblem]["hint"] != 'undefined' && problem[currExProblem]["hint"][0] != "") {
@@ -217,26 +214,39 @@ $(document).ready(function () {
     }
 
     function createCheckboxPanel(i) {
-        var panelGroupDiv = document.createElement('div');
-        $(panelGroupDiv).attr('class', 'panel-group');
-        var panelDefaultDiv = document.createElement('div');
-        $(panelDefaultDiv).attr('class', 'panel panel-default');
-        $(panelDefaultDiv).attr('id', 'ckbx' + i);
-        var panelHeadDiv = document.createElement('div');
-        $(panelHeadDiv).attr('class', 'panel-heading');
-
-        $(panelHeadDiv).append(createInputElement('checkbox', 'ck' + i));
-        $(panelHeadDiv).append(createSpanElement("cktxt" + i, problem[currExProblem]["answers"][i]));
+        var panelGroupDiv = createGroupDiv();
+        var panelDefaultDiv = createPanelDefaultDiv(i);
+        var panelHeadDiv = createPanelHeadDiv(i);
 
         $(panelDefaultDiv).append(panelHeadDiv);
         if (state === IN_STATIC_EXERCISE && problem[currExProblem]["explanation"][i] != "") {
             $(panelHeadDiv).append(createExplanationBtn('explanation' + i, i));
             $(panelDefaultDiv).append(createCollapsedExplanationPanel(problem[currExProblem]["explanation"][i], i));
         }
-
         $(panelGroupDiv).append(panelDefaultDiv);
         $('#ckcontainer').append(panelGroupDiv);
 
+    }
+
+    function createGroupDiv() {
+        var panelGroupDiv = document.createElement('div');
+        $(panelGroupDiv).attr('class', 'panel-group');
+        return panelGroupDiv;
+    }
+
+    function createPanelDefaultDiv(i) {
+        var panelDefaultDiv = document.createElement('div');
+        $(panelDefaultDiv).attr('class', 'panel panel-default');
+        $(panelDefaultDiv).attr('id', 'ckbx' + i);
+        return panelDefaultDiv;
+    }
+
+    function createPanelHeadDiv(i) {
+        var panelHeadDiv = document.createElement('div');
+        $(panelHeadDiv).attr('class', 'panel-heading');
+        $(panelHeadDiv).append(createInputElement('checkbox', 'ck' + i));
+        $(panelHeadDiv).append(createSpanElement("cktxt" + i, problem[currExProblem]["answers"][i]));
+        return panelHeadDiv;
     }
 
     function createCollapsedExplanationPanel(txt, i) {
@@ -311,10 +321,8 @@ $(document).ready(function () {
         btn.id = btnId;
         $(btn).text(explanationLabel);
         $(btn).attr('data-toggle', 'collapse');
-        //$(btn).attr('data-target', '#explanationDiv' + i);
         $(btn).attr('data-target', '#collapse' + i);
         $(btn).attr('aria-expanded', 'false');
-        //$(btn).attr('aria-controls', 'explanationDiv' + i);
         $(btn).attr('aria-controls', 'collapse' + i);
         return btn;
     }
