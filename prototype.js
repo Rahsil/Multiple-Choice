@@ -64,6 +64,7 @@ $(document).ready(function () {
         progressbarMax = numbExCurrLvl;
         numberOfChoices = problem[0]["answers"].length;
         createCheckboxes();
+        $('.panel-heading').click(onPanelClick);
         setExerciseTitle(problem[0]["problem"]);
         if (typeof problem[0]["hint"] != 'undefined' && problem[0]["hint"][0] != "") {
             $('#hintBtn').removeClass('disabled');
@@ -80,6 +81,7 @@ $(document).ready(function () {
         progressbarMax = numbExCurrLvl;
         numberOfChoices = problem[currExProblem]["answers"].length;
         createCheckboxes();
+        $('.panel-heading').click(onPanelClick);
         setExerciseTitle(problem[currExProblem]["problem"]);
         if (typeof problem[currExProblem]["hint"] != 'undefined' && problem[currExProblem]["hint"][0] != "") {
             $('#hintBtn').removeClass('disabled');
@@ -113,6 +115,24 @@ $(document).ready(function () {
     function exerciseFinished() {
         $('#ckcontainer').empty();
         allFinished();
+    }
+
+    function onPanelClick(){
+        if(solChecked){
+            return 0;
+        }
+        for(var i = 0; i < numberOfChoices; i++){
+            if(this.getAttribute('id') === ('panel-heading-'+i)){
+                if($('#ck' + i).is(":checked")){
+                    $('#ck' + i).prop('checked', false);
+                    break;
+                } else{
+                    $('#ck' + i).prop('checked', true);
+                    break;
+                }
+
+            }
+        }
     }
 
     function onNextBtn() {
@@ -194,6 +214,7 @@ $(document).ready(function () {
         $('#nextBtn').show();
         for (var i = 0; i < numberOfChoices; i++) {
             $('#explanation' + i).show();
+            $('#ck'+i).prop('disabled', true);
         }
     }
 
@@ -244,6 +265,7 @@ $(document).ready(function () {
     function createPanelHeadDiv(i) {
         var panelHeadDiv = document.createElement('div');
         $(panelHeadDiv).attr('class', 'panel-heading');
+        $(panelHeadDiv).attr('id', 'panel-heading-'+i);
         $(panelHeadDiv).append(createInputElement('checkbox', 'ck' + i));
         $(panelHeadDiv).append(createSpanElement("cktxt" + i, problem[currExProblem]["answers"][i]));
         return panelHeadDiv;
