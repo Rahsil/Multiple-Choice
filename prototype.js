@@ -283,22 +283,36 @@ $(document).ready(function () {
         return collapsedDiv;
     }
 
-    function setColors() {
-        for (var i = 0; i < numberOfChoices; i++) {
-            if ($.inArray(i, problem[currExProblem]["rightSolIDs"]) > -1) {
-                if ($('#ck' + i).is(":checked")) {
-                    $('#ckbx' + i).attr('class', 'panel panel-success');
-                } else {
-                    $('#ckbx' + i).attr('class', 'panel panel-danger');
+    function setColors(){
+        for(var i = 0; i < numberOfChoices; i++){
+            if($.inArray(i, problem[currExProblem]["rightSolIDs"]) > -1){
+                $('#ckbx'+i).prop('class', 'panel panel-success');
+                if($('#ck'+i).is(":checked")){
+                   $('#panel-heading-'+i).append(createGlyphiconOk());
+                } else{
+                    $('#panel-heading-'+i).append(createGlyphiconRemove());
                 }
-            } else {
-                if ($('#ck' + i).is(":checked")) {
-                    $('#ckbx' + i).attr('class', 'panel panel-danger');
-                } else {
-                    $('#ckbx' + i).attr('class', 'panel panel-success');
+            } else{
+                $('#ckbx'+i).prop('class', 'panel panel-danger');
+                if($('#ck'+i).is(":checked")){
+                    $('#panel-heading-'+i).append(createGlyphiconRemove());
+                } else{
+                    $('#panel-heading-'+i).append(createGlyphiconOk());
                 }
             }
         }
+    }
+
+    function createGlyphiconOk(){
+        var span = document.createElement('span');
+        $(span).prop('class', 'glyphicon glyphicon-ok pull-right text-success');
+        return span;
+    }
+
+    function createGlyphiconRemove(){
+        var span = document.createElement('span');
+        $(span).prop('class', 'glyphicon glyphicon-remove pull-right text-danger');
+        return span;
     }
 
     function checkRightAnswers() {
