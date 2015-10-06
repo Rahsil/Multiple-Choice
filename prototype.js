@@ -41,7 +41,7 @@ $(document).ready(function () {
 
     function initiate() {
         $('.progress-bar').attr("aria-valuemax", progressbarMax);
-        $('#sendBtn').click(checkSolution);
+        $('#sendBtn').click(onSendBtn);
         $('#nextBtn').click(onNextBtn);
         $('#hintBtn').click(onHintBtn);
         $('#nextBtn').hide();
@@ -95,28 +95,6 @@ $(document).ready(function () {
         }
     }
 
-    function lvlUp() {
-        numbRightSol = 0;
-        currExProblem = 0;
-        currentLvl++;
-        lvlProblem = lvlArray[currentLvl];
-        updateState();
-        if (state === IN_DYNAMIC_EXERCISE) {
-            updateProgressbar(numbRightSol);
-            setUpDynamicExercise(lvlProblem);
-        } else if (state === IN_STATIC_EXERCISE) {
-            updateProgressbar(numbRightSol);
-            setUpStaticExercise(lvlProblem);
-        } else {
-            console.log("Illegal State! " + state);
-        }
-    }
-
-    function exerciseFinished() {
-        $('#ckcontainer').empty();
-        allFinished();
-    }
-
     function onPanelClick(){
         if(solChecked){
             return 0;
@@ -132,6 +110,43 @@ $(document).ready(function () {
                 }
 
             }
+        }
+    }
+
+    function onSendBtn() {
+        if (isRight() && !solChecked) {
+            numbRightSol++;
+        } else if (state === IN_STATIC_EXERCISE && !solChecked) {
+            numbRightSol++;
+        }
+        setColors();
+        updateState();
+        if (!solChecked) {
+            updateNextBtnLabel();
+        }
+        solChecked = true;
+        updateProgressbar(numbRightSol);
+        $('#nextBtn').show();
+        for (var i = 0; i < numberOfChoices; i++) {
+            $('#explanation' + i).show();
+            $('#ck'+i).prop('disabled', true);
+        }
+    }
+
+    function onHintBtn() {
+        if (typeof problem[currExProblem]["hint"] === 'undefined') {
+            $('#hintBtn').addClass('disabled');
+            return 0;
+        }
+        if (!$('#hintBtn').hasClass('disabled') && hintNo < problem[currExProblem]["hint"].length) {
+            $('#hintDiv' + hintNo).collapse();
+            hintNo++;
+        }
+        if (hintNo === problem[currExProblem]["hint"].length) {
+            $('#hintBtn').addClass('disabled');
+            $('#hintBtn').removeAttr('data-toggle');
+        } else {
+            $('#hintBtn').text(newHintLabel);
         }
     }
 
@@ -154,35 +169,21 @@ $(document).ready(function () {
         }
     }
 
-    function onHintBtn() {
-        if (typeof problem[currExProblem]["hint"] === 'undefined') {
-            $('#hintBtn').addClass('disabled');
-            return 0;
-        }
-        if (!$('#hintBtn').hasClass('disabled') && hintNo < problem[currExProblem]["hint"].length) {
-            $('#hintDiv' + hintNo).collapse();
-            hintNo++;
-        }
-        if (hintNo === problem[currExProblem]["hint"].length) {
-            $('#hintBtn').addClass('disabled');
-            $('#hintBtn').removeAttr('data-toggle');
+    function lvlUp() {
+        numbRightSol = 0;
+        currExProblem = 0;
+        currentLvl++;
+        lvlProblem = lvlArray[currentLvl];
+        updateState();
+        if (state === IN_DYNAMIC_EXERCISE) {
+            updateProgressbar(numbRightSol);
+            setUpDynamicExercise(lvlProblem);
+        } else if (state === IN_STATIC_EXERCISE) {
+            updateProgressbar(numbRightSol);
+            setUpStaticExercise(lvlProblem);
         } else {
-            $('#hintBtn').text(newHintLabel);
+            console.log("Illegal State! " + state);
         }
-    }
-
-    function setExerciseTitle(exTitle) {
-        $('#exercise').text(exTitle);
-    }
-
-    function clearExercise() {
-        $('#ckcontainer').empty();
-        $('#nextBtn').hide();
-        $('#hintBtn').addClass('disabled');
-        $('#hintBtn').text(hintLabel);
-        $('.collapse').remove();
-        hintNo = 0;
-        solChecked = false;
     }
 
     function isRight() {
@@ -198,27 +199,45 @@ $(document).ready(function () {
         return true;
     }
 
-    function checkSolution() {
-        if (isRight() && !solChecked) {
-            numbRightSol++;
-        } else if (state === IN_STATIC_EXERCISE && !solChecked) {
-            numbRightSol++;
+    function checkRightAnswers() {
+        for (var i = 0; i < problem[currExProblem]["rightSolIDs"].length; i++) {
+            if (!$('#ck' + problem[currExProblem]["rightSolIDs"][i]).is(":checked")) {
+                return false;
+            }
         }
-        setColors();
-        updateState();
-        if (!solChecked) {
-            updateNextBtnLabel();
-        }
-        solChecked = true;
-        updateProgressbar(numbRightSol);
-        $('#nextBtn').show();
+        return true;
+    }
+
+    function checkWrongAnswers() {
         for (var i = 0; i < numberOfChoices; i++) {
-            $('#explanation' + i).show();
-            $('#ck'+i).prop('disabled', true);
+            if ($.inArray(i, problem[currExProblem]["rightSolIDs"]) > -1) {
+                continue;
+            }
+            if ($('#ck' + i).is(":checked")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function updateState() {
+        if (numbRightSol >= progressbarMax && state != NEXT_LEVEL) {
+            if (currentLvl === (numbLvl - 1)) {
+                state = EXERCISE_FINISHED;
+            } else {
+                state = NEXT_LEVEL;
+            }
+        } else {
+            if (lvlProblem()["isStatic"]) {
+                state = IN_STATIC_EXERCISE;
+            } else {
+                state = IN_DYNAMIC_EXERCISE;
+            }
         }
     }
 
-    function allFinished() {
+    function exerciseFinished() {
+        $('#ckcontainer').empty();
         var endDiv = document.createElement('div');
         endDiv.textContent = finalLabel;
         $(endDiv).attr('class', 'alert alert-info');
@@ -226,6 +245,79 @@ $(document).ready(function () {
         $('#ckcontainer').append(endDiv);
         $('#sendBtn').hide();
         $('#hintBtn').hide();
+    }
+
+
+
+
+
+    ////////// APPEARANCE //////////
+
+    function setExerciseTitle(exTitle) {
+        $('#exercise').text(exTitle);
+    }
+
+    function updateNextBtnLabel() {
+        switch (state) {
+            case EXERCISE_FINISHED:
+                $('#nextBtn').text(exFinLabel);
+                break;
+            case NEXT_LEVEL:
+                $('#nextBtn').text(nxtLvlLabel);
+                break;
+            case IN_DYNAMIC_EXERCISE:
+                $('#nextBtn').text(newExerciseLabel);
+                break;
+            case IN_STATIC_EXERCISE:
+                $('#nextBtn').text(newExerciseLabel);
+                break;
+            default:
+                $('#nextBtn').text(newExerciseLabel);
+        }
+    }
+
+    function updateProgressbar(numbRightSol) {
+        $('.progress-bar').attr("aria-valuenow", numbRightSol);
+        $('.progress-bar').attr('aria-valuemax', numbExCurrLvl + 1);
+        $('.progress-bar').attr('style', "width: " + (numbRightSol / progressbarMax) * 100 + "%;");
+    }
+
+    function createInputElement(inputType, inputId) {
+        var newCkBx = document.createElement('input');
+        newCkBx.type = inputType;
+        newCkBx.id = inputId;
+        return newCkBx;
+    }
+
+    function createSpanElement(spanID, spanTextContent) {
+        var newSpan = document.createElement('span');
+        newSpan.id = spanID;
+        newSpan.textContent = spanTextContent;
+        return newSpan;
+    }
+
+    function createExplanationBtn(btnId, i) {
+        var btn = document.createElement('button');
+        btn.type = "button";
+        $(btn).attr('class', 'btn btn-default btn-xs collapsed pull-right');
+        btn.id = btnId;
+        $(btn).text(explanationLabel);
+        $(btn).attr('data-toggle', 'collapse');
+        $(btn).attr('data-target', '#collapse' + i);
+        $(btn).attr('aria-expanded', 'false');
+        $(btn).attr('aria-controls', 'collapse' + i);
+        return btn;
+    }
+
+    function createCollapsedHint(txt, hintNo) {
+        var div = document.createElement("div");
+        var txtDiv = document.createElement("div");
+        $(txtDiv).text(txt);
+        $(txtDiv).attr('class', 'panel-body');
+        $(div).append(txtDiv);
+        $(div).attr('id', 'hintDiv' + hintNo);
+        $(div).attr('class', 'collapse panel panel-default');
+        return div;
     }
 
     function createCheckboxes() {
@@ -283,12 +375,24 @@ $(document).ready(function () {
         return collapsedDiv;
     }
 
+    function createGlyphiconOk(){
+        var span = document.createElement('span');
+        $(span).prop('class', 'glyphicon glyphicon-ok pull-right text-success');
+        return span;
+    }
+
+    function createGlyphiconRemove(){
+        var span = document.createElement('span');
+        $(span).prop('class', 'glyphicon glyphicon-remove pull-right text-danger');
+        return span;
+    }
+
     function setColors(){
         for(var i = 0; i < numberOfChoices; i++){
             if($.inArray(i, problem[currExProblem]["rightSolIDs"]) > -1){
                 $('#ckbx'+i).prop('class', 'panel panel-success');
                 if($('#ck'+i).is(":checked")){
-                   $('#panel-heading-'+i).append(createGlyphiconOk());
+                    $('#panel-heading-'+i).append(createGlyphiconOk());
                 } else{
                     $('#panel-heading-'+i).append(createGlyphiconRemove());
                 }
@@ -303,115 +407,13 @@ $(document).ready(function () {
         }
     }
 
-    function createGlyphiconOk(){
-        var span = document.createElement('span');
-        $(span).prop('class', 'glyphicon glyphicon-ok pull-right text-success');
-        return span;
-    }
-
-    function createGlyphiconRemove(){
-        var span = document.createElement('span');
-        $(span).prop('class', 'glyphicon glyphicon-remove pull-right text-danger');
-        return span;
-    }
-
-    function checkRightAnswers() {
-        for (var i = 0; i < problem[currExProblem]["rightSolIDs"].length; i++) {
-            if (!$('#ck' + problem[currExProblem]["rightSolIDs"][i]).is(":checked")) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    function checkWrongAnswers() {
-        for (var i = 0; i < numberOfChoices; i++) {
-            if ($.inArray(i, problem[currExProblem]["rightSolIDs"]) > -1) {
-                continue;
-            }
-            if ($('#ck' + i).is(":checked")) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    function createInputElement(inputType, inputId) {
-        var newCkBx = document.createElement('input');
-        newCkBx.type = inputType;
-        newCkBx.id = inputId;
-        return newCkBx;
-    }
-
-    function createSpanElement(spanID, spanTextContent) {
-        var newSpan = document.createElement('span');
-        newSpan.id = spanID;
-        newSpan.textContent = spanTextContent;
-        return newSpan;
-    }
-
-    function createExplanationBtn(btnId, i) {
-        var btn = document.createElement('button');
-        btn.type = "button";
-        $(btn).attr('class', 'btn btn-default btn-xs collapsed pull-right');
-        btn.id = btnId;
-        $(btn).text(explanationLabel);
-        $(btn).attr('data-toggle', 'collapse');
-        $(btn).attr('data-target', '#collapse' + i);
-        $(btn).attr('aria-expanded', 'false');
-        $(btn).attr('aria-controls', 'collapse' + i);
-        return btn;
-    }
-
-    function createCollapsedHint(txt, hintNo) {
-        var div = document.createElement("div");
-        var txtDiv = document.createElement("div");
-        $(txtDiv).text(txt);
-        $(txtDiv).attr('class', 'panel-body');
-        $(div).append(txtDiv);
-        $(div).attr('id', 'hintDiv' + hintNo);
-        $(div).attr('class', 'collapse panel panel-default');
-        return div;
-    }
-
-    function updateState() {
-        if (numbRightSol >= progressbarMax && state != NEXT_LEVEL) {
-            if (currentLvl === (numbLvl - 1)) {
-                state = EXERCISE_FINISHED;
-            } else {
-                state = NEXT_LEVEL;
-            }
-        } else {
-            if (lvlProblem()["isStatic"]) {
-                state = IN_STATIC_EXERCISE;
-            } else {
-                state = IN_DYNAMIC_EXERCISE;
-            }
-        }
-    }
-
-    function updateNextBtnLabel() {
-        switch (state) {
-            case EXERCISE_FINISHED:
-                $('#nextBtn').text(exFinLabel);
-                break;
-            case NEXT_LEVEL:
-                $('#nextBtn').text(nxtLvlLabel);
-                break;
-            case IN_DYNAMIC_EXERCISE:
-                $('#nextBtn').text(newExerciseLabel);
-                break;
-            case IN_STATIC_EXERCISE:
-                $('#nextBtn').text(newExerciseLabel);
-                break;
-            default:
-                $('#nextBtn').text(newExerciseLabel);
-        }
-    }
-
-    function updateProgressbar(numbRightSol) {
-        $('.progress-bar').attr("aria-valuenow", numbRightSol);
-        $('.progress-bar').attr('aria-valuemax', numbExCurrLvl + 1);
-        $('.progress-bar').attr('style', "width: " + (numbRightSol / progressbarMax) * 100 + "%;");
+    function clearExercise() {
+        $('#ckcontainer').empty();
+        $('#nextBtn').hide();
+        $('#hintBtn').addClass('disabled');
+        $('#hintBtn').text(hintLabel);
+        $('.collapse').remove();
+        hintNo = 0;
+        solChecked = false;
     }
 });
