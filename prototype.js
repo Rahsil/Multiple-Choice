@@ -98,11 +98,11 @@ $(document).ready(function () {
     }
 
     function setUpPanelClick(){
-        if(solChecked){
-            return 0;
-        }
         for(var i = 0; i < numberOfChoices; i++){
             $('#panel-heading-'+i).on('click', function(e){
+                if(solChecked){
+                    return 0;
+                }
                 var target = $(event.target);
                 if (target.is('input:checkbox')) return;
 
