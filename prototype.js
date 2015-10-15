@@ -46,6 +46,8 @@ $(document).ready(function () {
         $('#hintBtn').click(onHintBtn);
         $('#nextBtn').hide();
 
+
+
         lvlArray = [newLvl1Exercise, exampleExercise, newLvl2Exercise];
         numbLvl = lvlArray.length;
         lvlProblem = lvlArray[0];
@@ -64,7 +66,8 @@ $(document).ready(function () {
         progressbarMax = numbExCurrLvl;
         numberOfChoices = problem[0]["answers"].length;
         createCheckboxes();
-        $('.panel-heading').click(onPanelClick);
+        //$('.panel-heading').click(onPanelClick);
+        setUpPanelClick();
         setExerciseTitle(problem[0]["problem"]);
         if (typeof problem[0]["hint"] != 'undefined' && problem[0]["hint"][0] != "") {
             $('#hintBtn').removeClass('disabled');
@@ -81,7 +84,8 @@ $(document).ready(function () {
         progressbarMax = numbExCurrLvl;
         numberOfChoices = problem[currExProblem]["answers"].length;
         createCheckboxes();
-        $('.panel-heading').click(onPanelClick);
+        //$('.panel-heading').click(onPanelClick);
+        setUpPanelClick();
         setExerciseTitle(problem[currExProblem]["problem"]);
         if (typeof problem[currExProblem]["hint"] != 'undefined' && problem[currExProblem]["hint"][0] != "") {
             $('#hintBtn').removeClass('disabled');
@@ -95,21 +99,23 @@ $(document).ready(function () {
         }
     }
 
-    function onPanelClick(){
+    function setUpPanelClick(){
         if(solChecked){
             return 0;
         }
         for(var i = 0; i < numberOfChoices; i++){
-            if(this.getAttribute('id') === ('panel-heading-'+i)){
-                if($('#ck' + i).is(":checked")){
-                    $('#ck' + i).prop('checked', false);
-                    break;
-                } else{
-                    $('#ck' + i).prop('checked', true);
-                    break;
-                }
+            $('#panel-heading-'+i).on('click', function(e){
+                var target = $(event.target);
+                if (target.is('input:checkbox')) return;
 
-            }
+                var checkbox = $(this).find("input[type='checkbox']");
+
+                if( !checkbox.prop("checked") ){
+                    checkbox.prop("checked",true);
+                } else {
+                    checkbox.prop("checked",false);
+                }
+            });
         }
     }
 
@@ -249,8 +255,6 @@ $(document).ready(function () {
 
 
 
-
-
     ////////// APPEARANCE //////////
 
     function setExerciseTitle(exTitle) {
@@ -286,6 +290,7 @@ $(document).ready(function () {
         var newCkBx = document.createElement('input');
         newCkBx.type = inputType;
         newCkBx.id = inputId;
+        $(newCkBx).attr('class', 'ckbx');
         return newCkBx;
     }
 
@@ -377,17 +382,20 @@ $(document).ready(function () {
 
     function createGlyphiconOk(){
         var span = document.createElement('span');
-        $(span).prop('class', 'glyphicon glyphicon-ok pull-right text-success');
+        $(span).prop('class', 'glyphicon glyphicon-ok pull-left text-success');
         return span;
     }
 
     function createGlyphiconRemove(){
         var span = document.createElement('span');
-        $(span).prop('class', 'glyphicon glyphicon-remove pull-right text-danger');
+        $(span).prop('class', 'glyphicon glyphicon-remove pull-left text-danger');
         return span;
     }
 
     function setColors(){
+        if(solChecked){
+            return 0;
+        }
         for(var i = 0; i < numberOfChoices; i++){
             if($.inArray(i, problem[currExProblem]["rightSolIDs"]) > -1){
                 $('#ckbx'+i).prop('class', 'panel panel-success');
