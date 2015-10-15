@@ -66,7 +66,6 @@ $(document).ready(function () {
         progressbarMax = numbExCurrLvl;
         numberOfChoices = problem[0]["answers"].length;
         createCheckboxes();
-        //$('.panel-heading').click(onPanelClick);
         setUpPanelClick();
         setExerciseTitle(problem[0]["problem"]);
         if (typeof problem[0]["hint"] != 'undefined' && problem[0]["hint"][0] != "") {
@@ -84,7 +83,6 @@ $(document).ready(function () {
         progressbarMax = numbExCurrLvl;
         numberOfChoices = problem[currExProblem]["answers"].length;
         createCheckboxes();
-        //$('.panel-heading').click(onPanelClick);
         setUpPanelClick();
         setExerciseTitle(problem[currExProblem]["problem"]);
         if (typeof problem[currExProblem]["hint"] != 'undefined' && problem[currExProblem]["hint"][0] != "") {
